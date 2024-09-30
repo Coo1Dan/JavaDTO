@@ -8,6 +8,8 @@ public class User {
     private String phoneNumber;
     private UserRole role;
 
+    public User() {}
+
     public long getId() {
         return id;
     }
@@ -20,9 +22,8 @@ public class User {
         return name;
     }
 
-    public User setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return null;
     }
 
     public String getEmail() {
