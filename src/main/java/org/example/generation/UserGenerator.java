@@ -5,6 +5,7 @@ import org.example.models.User;
 import org.example.models.UserRole;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Random;
 
 public class UserGenerator {
@@ -23,31 +24,21 @@ public class UserGenerator {
     public static User fillUser(User dto) {
         Field[] fields = dto.getClass().getDeclaredFields();
         Random random = new Random();
-        for (Field f : fields) {
+        for (Field field : fields) {
             try {
-                f.setAccessible(true);
-                var val = f.get(dto);
+                field.setAccessible(true);
+                var val = field.get(dto);
                 if (val == null) {
-                    switch (f.getName()) {
-                        case "id":
-                            f.set(dto, random.nextLong());
-                            break;
-                        case "name":
-                            f.set(dto, RandomStringUtils.randomAlphabetic(random.nextInt(6) + 4));// random string;
-                            break;
-                        case "email":
-                            f.set(dto, RandomStringUtils.randomAlphabetic(20));
-                            break;
-                        case "phoneNumber":
-                            f.set(dto, RandomStringUtils.randomNumeric(11));
-                            break;
-                        case "role":
-                            var roles = UserRole.values();
-                            f.set(dto, roles[random.nextInt(roles.length)]);
-                            break;
-                        default:
-                            throw new RuntimeException("This field was not found!");
-                    }
+                    Type fieldType = field.getType();
+                    if (fieldType == Long.class) {
+                        field.set(dto, random.nextLong());
+                    } else if (fieldType == String.class) {
+                        field.set(dto, RandomStringUtils.randomAlphanumeric(15));
+                    } else if (fieldType == UserRole.class) {
+                        var roles = UserRole.values();
+                        field.set(dto, roles[random.nextInt(roles.length)]);
+                        break;
+                    } else throw new RuntimeException("This field was not found!");
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
